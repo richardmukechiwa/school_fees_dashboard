@@ -2,23 +2,10 @@ import streamlit as st
 import bcrypt
 from pyairtable import Table
 
-# get .env variables
-from dotenv import load_dotenv  
-import os
-load_dotenv()
-
-API_KEY = os.getenv("API_KEY")
-BASE_ID = os.getenv("BASE_ID")     
-SCHOOLS_TABLE = os.getenv("SCHOOLS_TABLE")
-
-
-
-
-
 # Airtable setup
-#API_KEY = "your_airtable_api_key"
-#BASE_ID = "your_base_id"
-#SCHOOLS_TABLE = "Schools"
+API_KEY = "your_airtable_api_key"
+BASE_ID = "your_base_id"
+SCHOOLS_TABLE = "Schools"
 
 schools_table = Table(API_KEY, BASE_ID, SCHOOLS_TABLE)
 
@@ -63,3 +50,4 @@ def login_school():
 school = login_school()
 if school:
     st.write(f"This is the dashboard for {school['school_name']}")
+
