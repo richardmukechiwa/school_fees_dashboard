@@ -2,3 +2,6 @@ streamlit
 pandas
 pyairtable
 python-dotenv
+bycrypt
+streamlit-authenticator
+streamlit-aggrid
