@@ -114,3 +114,12 @@ streamlit run app.py
 - Orange: % collected between orange and green
 
 - Red: % collected below orange threshold
+
+---
+License
+
+This project is licensed under the MIT License.
+---
+
+
+
