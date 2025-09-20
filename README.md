@@ -1,5 +1,3 @@
-# school_fees_dashboard
-
 # School Fees Dashboard
 
 A **Streamlit-based dashboard** for school administrators to track and manage student fee payments. Connects to **Airtable** for data storage and supports **dynamic KPI thresholds**, color-coded status indicators, and CSV exports.
