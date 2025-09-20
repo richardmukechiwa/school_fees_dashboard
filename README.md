@@ -38,10 +38,10 @@ pip install -r requirements.txt
 ---
 ### 3.Configure Environment Variables
 
-API_KEY=your_airtable_api_key
-BASE_ID=your_airtable_base_id
-SCHOOLS_TABLE=Schools
-FEES_TABLE=Fees
+- API_KEY=your_airtable_api_key
+- BASE_ID=your_airtable_base_id
+- SCHOOLS_TABLE=Schools
+- FEES_TABLE=Fees
 
 ### 4. Run the Dashboard
 
