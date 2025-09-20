@@ -27,85 +27,92 @@ A **Streamlit-based dashboard** for school administrators to track and manage st
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/yourusername/school-fees-dashboard.git
+git clone https://github.com/richardmukechiwa/school_fees_dashboard.git
 cd school-fees-dashboard
+```
+---
 
-Install Dependencies
-
+### 2. Install Dependencies
+---
+```bash
 pip install -r requirements.txt
-
-Configure Environment Variables
+```
+---
+### 3.Configure Environment Variables
 
 API_KEY=your_airtable_api_key
 BASE_ID=your_airtable_base_id
 SCHOOLS_TABLE=Schools
 FEES_TABLE=Fees
 
-Run the Dashboard
+### 4. Run the Dashboard
 
+```bash
 streamlit run app.py
+```
+---
+## Usage Guide
 
-Usage Guide
-Login
+- Login
 
-Enter your school admin email and password.
+- Enter your school admin email and password.
 
-Optionally check Remember me.
+- Optionally check Remember me.
 
-Click Login to access the dashboard.
+- Click Login to access the dashboard.
 
-KPI Threshold Settings
+- KPI Threshold Settings
 
-Expand ⚙️ KPI Threshold Settings.
+- Expand ⚙️ KPI Threshold Settings.
 
-Set High Outstanding Alert (USD) to trigger warnings.
+- Set High Outstanding Alert (USD) to trigger warnings.
 
-Set % Collected Green Threshold and % Collected Orange Threshold.
+- Set % Collected Green Threshold and % Collected Orange Threshold.
 
-Close the section to view metrics.
+- Close the section to view metrics.
 
-Dashboard Metrics
+- Dashboard Metrics
 
-Total Outstanding: Sum of unpaid balances.
+- Total Outstanding: Sum of unpaid balances.
 
-Parents Owing: Count of parents with unpaid fees.
+- Parents Owing: Count of parents with unpaid fees.
 
-% Collected: Shows fee collection progress with color-coded delta.
+- % Collected: Shows fee collection progress with color-coded delta.
 
-Outstanding by Parent: Expand to see bar charts and parent summaries.
+- Outstanding by Parent: Expand to see bar charts and parent summaries.
 
-Detailed Fees Records: Expand to see all fee records with color-coded Status and Balance Due.
+- Detailed Fees Records: Expand to see all fee records with color-coded Status and Balance Due.
 
-Update Payment
+### Update Payment
 
-Expand Update Payment.
+- Expand Update Payment.
 
-Select Parent → Child → Enter Amount Paid.
+→ Select Parent → Child → Enter Amount Paid.
+ 
+→ Click Submit Payment.
 
-Click Submit Payment.
+→ SDashboard updates local balances and status automatically.
 
-Dashboard updates local balances and status automatically.
+### Download Reports
 
-Download Reports
+- Expand Download Reports to export CSVs:
 
-Expand Download Reports to export CSVs:
+→ All Fees CSV
 
-All Fees CSV
+→ Unpaid Fees CSV
 
-Unpaid Fees CSV
+### Theme Toggle
 
-Theme Toggle
+→ Switch between Light and Dark modes via the sidebar.
 
-Switch between Light and Dark modes via the sidebar.
+## Notes
 
-Notes
+- balance_due is a computed field in Airtable; the dashboard updates only amount_paid to avoid errors.
 
-balance_due is a computed field in Airtable; the dashboard updates only amount_paid to avoid errors.
+- Color-coded KPI thresholds:
 
-Color-coded KPI thresholds:
+- Green: % collected above green threshold
 
-Green: % collected above green threshold
+- Orange: % collected between orange and green
 
-Orange: % collected between orange and green
-
-Red: % collected below orange threshold
+- Red: % collected below orange threshold
