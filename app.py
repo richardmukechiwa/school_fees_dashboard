@@ -8,16 +8,41 @@ from dotenv import load_dotenv
 import plotly.express as px
 
 # ---- Load environment variables ----
-load_dotenv()
-API_KEY = os.getenv("API_KEY")
-BASE_ID = os.getenv("BASE_ID")
-SCHOOLS_TABLE = os.getenv("SCHOOLS_TABLE")
-FEES_TABLE = os.getenv("FEES_TABLE", "Fees")
+# Locally: from .env
+# On Streamlit Cloud: from st.secrets
+if os.path.exists(".env"):
+    load_dotenv()
+
+def get_secret(key, default=None):
+    """Fetch variable from st.secrets (Cloud) or os.getenv (.env)"""
+    if key in st.secrets:
+        source = "st.secrets"
+        val = st.secrets[key]
+    else:
+        source = ".env"
+        val = os.getenv(key, default)
+
+    if val is None:
+        raise ValueError(f"{key} is not set in {source}. Please configure it.")
+    return str(val).strip().strip('"').strip("'")
+
+# ---- Airtable Config ----
+API_KEY = get_secret("API_KEY")
+BASE_ID = get_secret("BASE_ID")
+SCHOOLS_TABLE = get_secret("SCHOOLS_TABLE")
+FEES_TABLE = get_secret("FEES_TABLE", "Fees")
+
+st.sidebar.info(f"✅ Config loaded from {'st.secrets' if 'API_KEY' in st.secrets else '.env'}")
 
 # ---- Airtable Setup ----
-api = Api(API_KEY)
-schools_table = api.table(BASE_ID, SCHOOLS_TABLE)
-fees_table = api.table(BASE_ID, FEES_TABLE)
+try:
+    api = Api(API_KEY)
+    schools_table = api.table(BASE_ID, SCHOOLS_TABLE)
+    fees_table = api.table(BASE_ID, FEES_TABLE)
+except Exception as e:
+    st.error(f"Failed to connect to Airtable: {e}")
+    st.stop()
+
 
 # ---- Page Setup ----
 st.set_page_config(page_title="School Fees Dashboard", layout="wide")
@@ -209,8 +234,6 @@ def show_dashboard():
 
     # ---- KPI Display ----
     col1, col2, col3 = st.columns(3)
-
-    # Total Outstanding
     outstanding_color = get_outstanding_color(total_outstanding)
     if outstanding_color == "green":
         col1.success(f"💵 Total Outstanding: USD {total_outstanding:,.2f} (Below threshold)")
@@ -219,10 +242,8 @@ def show_dashboard():
     else:
         col1.error(f"🚨 Total Outstanding: USD {total_outstanding:,.2f} (Exceeded threshold)")
 
-    # Parents Owing
     col2.metric("👨‍👩‍👦 Parents Owing", num_parents)
 
-    # % Collected
     pct_color = get_percent_collected_color(percent_collected)
     color_map = {"green": "#4caf50", "orange": "#ff9800", "red": "#f44336"}
     col3.markdown(f"<h3 style='color:{color_map[pct_color]}'>📈 % Collected: {percent_collected:.1f}%</h3>", unsafe_allow_html=True)
@@ -342,4 +363,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
