@@ -4,6 +4,7 @@
         "gensalt",
         "hashpw",
         "Naez",
+        "patjs",
         "pyairtable"
     ]
 }
