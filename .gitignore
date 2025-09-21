@@ -209,5 +209,3 @@ __marimo__/
 
 
 # Environment variables file
-
-.streamlit/secrets.toml
