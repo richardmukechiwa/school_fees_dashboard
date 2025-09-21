@@ -2,29 +2,18 @@ import streamlit as st
 import pandas as pd
 from pyairtable import Api
 import bcrypt
-import os
 import time
-from dotenv import load_dotenv
 import plotly.express as px
 
-# ---- Load environment variables ----
-# Locally: from .env
-# On Streamlit Cloud: from st.secrets
-if os.path.exists(".env"):
-    load_dotenv()
-
+# ---- Secret Loader ----
 def get_secret(key, default=None):
-    """Fetch variable from st.secrets (Cloud) or os.getenv (.env)"""
+    """Fetch variable from st.secrets only"""
     if key in st.secrets:
-        source = "st.secrets"
-        val = st.secrets[key]
-    else:
-        source = ".env"
-        val = os.getenv(key, default)
-
-    if val is None:
-        raise ValueError(f"{key} is not set in {source}. Please configure it.")
-    return str(val).strip().strip('"').strip("'")
+        return str(st.secrets[key]).strip().strip('"').strip("'")
+    if default is not None:
+        return default
+    st.error(f"❌ Secret {key} is not set. Please add it to .streamlit/secrets.toml (local) or Streamlit Cloud Secrets.")
+    st.stop()
 
 # ---- Airtable Config ----
 API_KEY = get_secret("API_KEY")
@@ -32,7 +21,7 @@ BASE_ID = get_secret("BASE_ID")
 SCHOOLS_TABLE = get_secret("SCHOOLS_TABLE")
 FEES_TABLE = get_secret("FEES_TABLE", "Fees")
 
-st.sidebar.info(f"✅ Config loaded from {'st.secrets' if 'API_KEY' in st.secrets else '.env'}")
+st.sidebar.info("✅ Config loaded from st.secrets")
 
 # ---- Airtable Setup ----
 try:
@@ -42,7 +31,6 @@ try:
 except Exception as e:
     st.error(f"Failed to connect to Airtable: {e}")
     st.stop()
-
 
 # ---- Page Setup ----
 st.set_page_config(page_title="School Fees Dashboard", layout="wide")
@@ -127,7 +115,6 @@ def fetch_school_fees(school_id: str) -> pd.DataFrame:
         parent_whatsapp = normalize_text(f.get("Parent WhatsApp"))
         parent_email = normalize_text(f.get("Parent Email")).lower()
 
-        # Normalize student_name
         raw_student = f.get("student_name", "")
         if isinstance(raw_student, list):
             student_list = [normalize_text(x).title() for x in raw_student if normalize_text(x)]
@@ -184,7 +171,6 @@ def show_dashboard():
         st.warning("Session expired. Please log in again.")
         logout()
 
-    # ---- KPI Threshold Settings ----
     with st.expander("⚙️ KPI Threshold Settings", expanded=False):
         st.session_state.setdefault("high_outstanding_threshold", 1000.0)
         st.session_state.setdefault("percent_collected_green", 80)
@@ -204,7 +190,6 @@ def show_dashboard():
             st.session_state["percent_collected_orange"]
         )
 
-    # ---- Fetch Data ----
     df = fetch_school_fees(st.session_state['school_id'])
     df_unpaid = df[df["Balance Due"] > 0]
 
@@ -215,7 +200,6 @@ def show_dashboard():
     total_due = df["Due Amount"].sum()
     percent_collected = 100 * (total_due - total_outstanding) / total_due if total_due > 0 else 0
 
-    # ---- KPI Color Helpers ----
     def get_percent_collected_color(percent_collected):
         if percent_collected >= st.session_state["percent_collected_green"]:
             return "green"
@@ -232,7 +216,6 @@ def show_dashboard():
         else:
             return "red"
 
-    # ---- KPI Display ----
     col1, col2, col3 = st.columns(3)
     outstanding_color = get_outstanding_color(total_outstanding)
     if outstanding_color == "green":
@@ -248,7 +231,6 @@ def show_dashboard():
     color_map = {"green": "#4caf50", "orange": "#ff9800", "red": "#f44336"}
     col3.markdown(f"<h3 style='color:{color_map[pct_color]}'>📈 % Collected: {percent_collected:.1f}%</h3>", unsafe_allow_html=True)
 
-    # ---- Outstanding by Parent ----
     with st.expander("Outstanding by Parent"):
         if not df_unpaid.empty:
             parent_summary = (
@@ -282,18 +264,15 @@ def show_dashboard():
         else:
             st.info("No outstanding fees for this school.")
 
-    # ---- Detailed Fees Records ----
     with st.expander("Detailed Fees Records"):
         st.dataframe(df.style.map(color_status, subset=["Status"]).map(color_balance, subset=["Balance Due"]))
 
-    # ---- Download Reports ----
     with st.expander("Download Reports"):
         st.download_button("Download All Fees CSV", df.to_csv(index=False).encode('utf-8'),
                            file_name=f"{st.session_state['school_name']}_all_fees.csv", mime="text/csv")
         st.download_button("Download Unpaid Fees CSV", df_unpaid.to_csv(index=False).encode('utf-8'),
                            file_name=f"{st.session_state['school_name']}_unpaid_fees.csv", mime="text/csv")
 
-    # ---- Update Payment Section ----
     with st.expander("Update Payment"):
         parent_choice = st.selectbox("Select Parent", df_unpaid["Parent Name"].unique())
         parent_records = df[df["Parent Name"] == parent_choice]
@@ -320,7 +299,6 @@ def show_dashboard():
                         new_paid = current_paid + amount
                         new_status = "unpaid" if new_paid == 0 else ("partial" if new_paid < due else "paid")
 
-                        # Update only writable fields
                         fees_table.update(record_id, {
                             "amount_paid": new_paid
                         })
@@ -331,7 +309,6 @@ def show_dashboard():
                 if not found:
                     st.error(f"No record found for {child_choice} under {parent_choice}.")
 
-    # ---- Logout Button ----
     st.markdown("""
         <style>.logout-btn {position: fixed; bottom: 20px; right: 20px; z-index: 9999;}</style>
     """, unsafe_allow_html=True)
@@ -363,5 +340,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
