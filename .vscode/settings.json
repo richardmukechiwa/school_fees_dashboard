@@ -3,6 +3,7 @@
         "checkpw",
         "gensalt",
         "hashpw",
+        "Naez",
         "pyairtable"
     ]
 }
