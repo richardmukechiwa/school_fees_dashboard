@@ -1,3 +1,8 @@
+import os
+
+print(os.getenv("API_KEY"))
+
+
 import streamlit as st
 import pandas as pd
 from pyairtable import Api
@@ -6,6 +11,8 @@ import os
 import time
 from dotenv import load_dotenv
 import plotly.express as px
+
+
 
 # ---- Load environment variables ----
 # Only load .env locally, not on Streamlit Cloud
@@ -18,6 +25,7 @@ def get_env(var_name, default=None):
     if val is None:
         raise ValueError(f"{var_name} is not set! Set it in .env or Streamlit environment variables.")
     return val.strip().strip('"').strip("'")
+
 
 API_KEY = get_env("API_KEY")
 BASE_ID = get_env("BASE_ID")
