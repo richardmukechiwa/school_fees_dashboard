@@ -1,12 +1,5 @@
 import os
 import streamlit as st
-
-st.write("API_KEY =", os.getenv("API_KEY"))
-st.write("BASE_ID =", os.getenv("BASE_ID"))
-
-
-import os
-import streamlit as st
 import pandas as pd
 from pyairtable import Api
 import bcrypt
@@ -29,16 +22,13 @@ def get_env(var_name, default=None):
     return val.strip().strip('"').strip("'")
 
 
-API_KEY = get_env("API_KEY")
-BASE_ID = get_env("BASE_ID")
-SCHOOLS_TABLE = get_env("SCHOOLS_TABLE")
-FEES_TABLE = get_env("FEES_TABLE", "Fees")
+API_KEY = st.secrets["API_KEY"]
+BASE_ID = st.secrets["BASE_ID"]
+SCHOOLS_TABLE = st.secrets["SCHOOLS_TABLE"]
+FEES_TABLE = st.secrets["FEES_TABLE"]
 
 st.sidebar.info("✅ Config loaded from st.secrets")
-API_KEY = get_env("API_KEY")
-BASE_ID = get_env("BASE_ID")
-SCHOOLS_TABLE = get_env("SCHOOLS_TABLE")
-FEES_TABLE = get_env("FEES_TABLE", "Fees")
+
 
 # ---- Airtable Setup ----
 try:
