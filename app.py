@@ -25,7 +25,7 @@ def get_env(var_name, default=None):
 API_KEY = st.secrets["API_KEY"]
 BASE_ID = st.secrets["BASE_ID"]
 SCHOOLS_TABLE = st.secrets["SCHOOLS_TABLE"]
-FEES_TABLE = st.secrets["FEES_TABLE"]
+TABLE_NAME = st.secrets["TABLE_NAME"]
 
 st.sidebar.info("✅ Config loaded from st.secrets")
 
