@@ -1,13 +1,15 @@
 import os
+import streamlit as st
 
-print(os.getenv("API_KEY"))
+st.write("API_KEY =", os.getenv("API_KEY"))
+st.write("BASE_ID =", os.getenv("BASE_ID"))
 
 
+import os
 import streamlit as st
 import pandas as pd
 from pyairtable import Api
 import bcrypt
-import os
 import time
 from dotenv import load_dotenv
 import plotly.express as px
@@ -31,19 +33,6 @@ API_KEY = get_env("API_KEY")
 BASE_ID = get_env("BASE_ID")
 SCHOOLS_TABLE = get_env("SCHOOLS_TABLE")
 FEES_TABLE = get_env("FEES_TABLE", "Fees")
-
-
-# ---- Load environment variables ----
-# Only load .env locally, not on Streamlit Cloud
-if not os.environ.get("STREAMLIT_SERVER"):
-    load_dotenv()
-
-def get_env(var_name, default=None):
-    """Fetch environment variable, strip quotes/spaces, raise error if missing and no default"""
-    val = os.getenv(var_name, default)
-    if val is None:
-        raise ValueError(f"{var_name} is not set! Set it in .env or Streamlit environment variables.")
-    return val.strip().strip('"').strip("'")
 
 st.sidebar.info("✅ Config loaded from st.secrets")
 API_KEY = get_env("API_KEY")
