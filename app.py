@@ -3,10 +3,7 @@ import pandas as pd
 from pyairtable import Api
 import bcrypt
 import time
-<<<<<<< HEAD
 from dotenv import load_dotenv
-=======
->>>>>>> a8f379f1c6ecec6d090cacf2a1cd214c06870bef
 import plotly.express as px
 
 # ---- Secret Loader ----
