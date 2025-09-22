@@ -23,13 +23,7 @@ API_KEY = get_env("API_KEY")
 BASE_ID = get_env("BASE_ID")
 SCHOOLS_TABLE = get_env("SCHOOLS_TABLE")
 FEES_TABLE = get_env("FEES_TABLE", "Fees")
-=======
-=======
-import os
->>>>>>> 11493a4 (code update)
-import time
-from dotenv import load_dotenv
-import plotly.express as px
+
 
 # ---- Load environment variables ----
 # Only load .env locally, not on Streamlit Cloud
@@ -43,15 +37,11 @@ def get_env(var_name, default=None):
         raise ValueError(f"{var_name} is not set! Set it in .env or Streamlit environment variables.")
     return val.strip().strip('"').strip("'")
 
-<<<<<<< HEAD
 st.sidebar.info("✅ Config loaded from st.secrets")
->>>>>>> a8f379f1c6ecec6d090cacf2a1cd214c06870bef
-=======
 API_KEY = get_env("API_KEY")
 BASE_ID = get_env("BASE_ID")
 SCHOOLS_TABLE = get_env("SCHOOLS_TABLE")
 FEES_TABLE = get_env("FEES_TABLE", "Fees")
->>>>>>> 11493a4 (code update)
 
 # ---- Airtable Setup ----
 try:
@@ -145,14 +135,11 @@ def fetch_school_fees(school_id: str) -> pd.DataFrame:
         parent_whatsapp = normalize_text(f.get("Parent WhatsApp"))
         parent_email = normalize_text(f.get("Parent Email")).lower()
 
-<<<<<<< HEAD
-<<<<<<< HEAD
+
         # Normalize student_name
-=======
->>>>>>> a8f379f1c6ecec6d090cacf2a1cd214c06870bef
-=======
+
         # Normalize student_name
->>>>>>> 11493a4 (code update)
+
         raw_student = f.get("student_name", "")
         if isinstance(raw_student, list):
             student_list = [normalize_text(x).title() for x in raw_student if normalize_text(x)]
@@ -209,14 +196,9 @@ def show_dashboard():
         st.warning("Session expired. Please log in again.")
         logout()
 
-<<<<<<< HEAD
-<<<<<<< HEAD
+
     # ---- KPI Threshold Settings ----
-=======
->>>>>>> a8f379f1c6ecec6d090cacf2a1cd214c06870bef
-=======
-    # ---- KPI Threshold Settings ----
->>>>>>> 11493a4 (code update)
+
     with st.expander("⚙️ KPI Threshold Settings", expanded=False):
         st.session_state.setdefault("high_outstanding_threshold", 1000.0)
         st.session_state.setdefault("percent_collected_green", 80)
@@ -236,14 +218,9 @@ def show_dashboard():
             st.session_state["percent_collected_orange"]
         )
 
-<<<<<<< HEAD
-<<<<<<< HEAD
+
     # ---- Fetch Data ----
-=======
->>>>>>> a8f379f1c6ecec6d090cacf2a1cd214c06870bef
-=======
-    # ---- Fetch Data ----
->>>>>>> 11493a4 (code update)
+
     df = fetch_school_fees(st.session_state['school_id'])
     df_unpaid = df[df["Balance Due"] > 0]
 
@@ -254,14 +231,9 @@ def show_dashboard():
     total_due = df["Due Amount"].sum()
     percent_collected = 100 * (total_due - total_outstanding) / total_due if total_due > 0 else 0
 
-<<<<<<< HEAD
-<<<<<<< HEAD
+
     # ---- KPI Color Helpers ----
-=======
->>>>>>> a8f379f1c6ecec6d090cacf2a1cd214c06870bef
-=======
-    # ---- KPI Color Helpers ----
->>>>>>> 11493a4 (code update)
+
     def get_percent_collected_color(percent_collected):
         if percent_collected >= st.session_state["percent_collected_green"]:
             return "green"
@@ -278,14 +250,8 @@ def show_dashboard():
         else:
             return "red"
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-    # ---- KPI Display ----
-=======
->>>>>>> a8f379f1c6ecec6d090cacf2a1cd214c06870bef
-=======
-    # ---- KPI Display ----
->>>>>>> 11493a4 (code update)
+
+    # ---- KPI Display ---
     col1, col2, col3 = st.columns(3)
     outstanding_color = get_outstanding_color(total_outstanding)
     if outstanding_color == "green":
@@ -301,14 +267,9 @@ def show_dashboard():
     color_map = {"green": "#4caf50", "orange": "#ff9800", "red": "#f44336"}
     col3.markdown(f"<h3 style='color:{color_map[pct_color]}'>📈 % Collected: {percent_collected:.1f}%</h3>", unsafe_allow_html=True)
 
-<<<<<<< HEAD
-<<<<<<< HEAD
+
     # ---- Outstanding by Parent ----
-=======
->>>>>>> a8f379f1c6ecec6d090cacf2a1cd214c06870bef
-=======
-    # ---- Outstanding by Parent ----
->>>>>>> 11493a4 (code update)
+
     with st.expander("Outstanding by Parent"):
         if not df_unpaid.empty:
             parent_summary = (
@@ -341,36 +302,24 @@ def show_dashboard():
             st.dataframe(parent_summary.drop(columns="Color"))
         else:
             st.info("No outstanding fees for this school.")
-
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 11493a4 (code update)
+            
     # ---- Detailed Fees Records ----
     with st.expander("Detailed Fees Records"):
         st.dataframe(df.style.map(color_status, subset=["Status"]).map(color_balance, subset=["Balance Due"]))
 
     # ---- Download Reports ----
-<<<<<<< HEAD
-=======
+
     with st.expander("Detailed Fees Records"):
         st.dataframe(df.style.map(color_status, subset=["Status"]).map(color_balance, subset=["Balance Due"]))
 
->>>>>>> a8f379f1c6ecec6d090cacf2a1cd214c06870bef
-=======
->>>>>>> 11493a4 (code update)
     with st.expander("Download Reports"):
         st.download_button("Download All Fees CSV", df.to_csv(index=False).encode('utf-8'),
                            file_name=f"{st.session_state['school_name']}_all_fees.csv", mime="text/csv")
         st.download_button("Download Unpaid Fees CSV", df_unpaid.to_csv(index=False).encode('utf-8'),
                            file_name=f"{st.session_state['school_name']}_unpaid_fees.csv", mime="text/csv")
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-    # ---- Update Payment Section ----
-=======
->>>>>>> a8f379f1c6ecec6d090cacf2a1cd214c06870bef
-=======
+
+
     # ---- Update Payment Section ----
 >>>>>>> 11493a4 (code update)
     with st.expander("Update Payment"):
@@ -399,14 +348,9 @@ def show_dashboard():
                         new_paid = current_paid + amount
                         new_status = "unpaid" if new_paid == 0 else ("partial" if new_paid < due else "paid")
 
-<<<<<<< HEAD
-<<<<<<< HEAD
+
                         # Update only writable fields
-=======
->>>>>>> a8f379f1c6ecec6d090cacf2a1cd214c06870bef
-=======
-                        # Update only writable fields
->>>>>>> 11493a4 (code update)
+
                         fees_table.update(record_id, {
                             "amount_paid": new_paid
                         })
@@ -417,14 +361,9 @@ def show_dashboard():
                 if not found:
                     st.error(f"No record found for {child_choice} under {parent_choice}.")
 
-<<<<<<< HEAD
-<<<<<<< HEAD
+
     # ---- Logout Button ----
-=======
->>>>>>> a8f379f1c6ecec6d090cacf2a1cd214c06870bef
-=======
-    # ---- Logout Button ----
->>>>>>> 11493a4 (code update)
+    
     st.markdown("""
         <style>.logout-btn {position: fixed; bottom: 20px; right: 20px; z-index: 9999;}</style>
     """, unsafe_allow_html=True)
@@ -456,13 +395,4 @@ def main():
 
 if __name__ == "__main__":
     main()
-<<<<<<< HEAD
-<<<<<<< HEAD
 
-
-=======
->>>>>>> a8f379f1c6ecec6d090cacf2a1cd214c06870bef
-=======
-
-
->>>>>>> 11493a4 (code update)
