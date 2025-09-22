@@ -7,8 +7,6 @@ import time
 from dotenv import load_dotenv
 import plotly.express as px
 
-
-
 # ---- Load environment variables ----
 # Only load .env locally, not on Streamlit Cloud
 if not os.environ.get("STREAMLIT_SERVER"):
@@ -21,14 +19,12 @@ def get_env(var_name, default=None):
         raise ValueError(f"{var_name} is not set! Set it in .env or Streamlit environment variables.")
     return val.strip().strip('"').strip("'")
 
-
 API_KEY = st.secrets["API_KEY"]
 BASE_ID = st.secrets["BASE_ID"]
 SCHOOLS_TABLE = st.secrets["SCHOOLS_TABLE"]
 TABLE_NAME = st.secrets["TABLE_NAME"]
 
-st.sidebar.info("✅ Config loaded from st.secrets")
-
+#st.sidebar.info("✅ Config loaded from st.secrets")
 
 # ---- Airtable Setup ----
 try:
@@ -85,9 +81,12 @@ def login(email: str, password: str) -> bool:
         return False
 
 def logout():
+    # clear session state
     for key in ["school_id", "school_name", "login_time", "logged_in"]:
         st.session_state.pop(key, None)
+    # clear all query params
     st.query_params.clear()
+    # rerun app to show login screen
     st.rerun()
 
 # ---- Normalizer ----
@@ -122,7 +121,6 @@ def fetch_school_fees(school_id: str) -> pd.DataFrame:
         parent_whatsapp = normalize_text(f.get("Parent WhatsApp"))
         parent_email = normalize_text(f.get("Parent Email")).lower()
 
-        # Normalize student_name
         raw_student = f.get("student_name", "")
         if isinstance(raw_student, list):
             student_list = [normalize_text(x).title() for x in raw_student if normalize_text(x)]
@@ -276,11 +274,12 @@ def show_dashboard():
             st.dataframe(parent_summary.drop(columns="Color"))
         else:
             st.info("No outstanding fees for this school.")
-            
+
     # ---- Detailed Fees Records ----
     with st.expander("Detailed Fees Records"):
         st.dataframe(df.style.map(color_status, subset=["Status"]).map(color_balance, subset=["Balance Due"]))
 
+    # ---- Download Reports ----
     with st.expander("Download Reports"):
         st.download_button("Download All Fees CSV", df.to_csv(index=False).encode('utf-8'),
                            file_name=f"{st.session_state['school_name']}_all_fees.csv", mime="text/csv")
@@ -314,7 +313,6 @@ def show_dashboard():
                         new_paid = current_paid + amount
                         new_status = "unpaid" if new_paid == 0 else ("partial" if new_paid < due else "paid")
 
-                        # Update only writable fields
                         fees_table.update(record_id, {
                             "amount_paid": new_paid
                         })
@@ -335,12 +333,25 @@ def show_dashboard():
 # ---- Main ----
 def main():
     params = st.query_params
-    if params.get("remember") == ["1"]:
-        if not st.session_state.get("logged_in", False) and "school_id" in st.session_state:
-            st.session_state['logged_in'] = True
 
-    if st.session_state.get('logged_in', False):
-        show_dashboard()
+    # --- Rehydration from query params ---
+    if params.get("remember") == ["1"]:
+        if not st.session_state.get("logged_in", False):
+            st.session_state['school_id'] = params.get("school_id", [""])[0]
+            st.session_state['school_name'] = params.get("school_name", [""])[0]
+            login_time_param = params.get("login_time", ["0"])[0]
+            st.session_state['login_time'] = float(login_time_param) if login_time_param else 0
+            if st.session_state['school_id']:
+                st.session_state['logged_in'] = True
+
+    # --- Login / Dashboard flow ---
+    if st.session_state.get("logged_in", False):
+        elapsed = time.time() - st.session_state.get("login_time", 0)
+        if elapsed > SESSION_TIMEOUT:
+            st.warning("Session expired. Please log in again.")
+            logout()
+        else:
+            show_dashboard()
     else:
         st.title("School Login")
         email = st.text_input("Email")
@@ -350,10 +361,16 @@ def main():
             if login(email, password):
                 st.success(f"Welcome {st.session_state['school_name']}")
                 if remember_me:
-                    st.query_params.update({"remember": "1"})
+                    st.session_state['login_time'] = time.time()
+                    st.query_params.update({
+                        "remember": "1",
+                        "school_id": st.session_state['school_id'],
+                        "school_name": st.session_state['school_name'],
+                        "login_time": str(st.session_state['login_time'])
+                    })
                 st.rerun()
             else:
-                st.error("Invalid credentials")
+                st.error("Invalid login credentials")
 
 if __name__ == "__main__":
     main()
