@@ -34,7 +34,7 @@ st.sidebar.info("✅ Config loaded from st.secrets")
 try:
     api = Api(API_KEY)
     schools_table = api.table(BASE_ID, SCHOOLS_TABLE)
-    fees_table = api.table(BASE_ID, FEES_TABLE)
+    fees_table = api.table(BASE_ID, TABLE_NAME)
 except Exception as e:
     st.error(f"Failed to connect to Airtable: {e}")
     st.stop()
