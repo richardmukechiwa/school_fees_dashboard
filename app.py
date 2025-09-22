@@ -321,7 +321,7 @@ def show_dashboard():
 
 
     # ---- Update Payment Section ----
->>>>>>> 11493a4 (code update)
+
     with st.expander("Update Payment"):
         parent_choice = st.selectbox("Select Parent", df_unpaid["Parent Name"].unique())
         parent_records = df[df["Parent Name"] == parent_choice]
